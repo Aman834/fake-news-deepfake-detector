@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: deepguard-ai
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: NODE_VERSION
+        value: "20"
+      - key: DEBUG
+        value: "false"
+    plan: free
+    healthCheckPath: /api/health

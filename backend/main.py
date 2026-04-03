@@ -8,6 +8,7 @@ import sys
 import os
 from pathlib import Path
 from contextlib import asynccontextmanager
+from fastapi.responses import FileResponse
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -126,6 +127,38 @@ async def aggregate_scores(scores: dict):
     from backend.confidence_service import confidence_aggregator
     result = confidence_aggregator.aggregate(scores)
     return result
+
+
+# ---------- Serve React Frontend (Production) ----------
+FRONTEND_BUILD = PROJECT_ROOT / "frontend_build"
+
+if FRONTEND_BUILD.exists() and FRONTEND_BUILD.is_dir():
+    logger.info(f"📁 Serving React frontend from {FRONTEND_BUILD}")
+    
+    # Mount static assets (JS, CSS, images)
+    app.mount("/assets", StaticFiles(directory=str(FRONTEND_BUILD / "assets")), name="frontend-assets")
+    
+    # Serve other static files (favicon, icons, etc.)
+    @app.get("/favicon.svg")
+    @app.get("/icons.svg")
+    async def serve_static_files():
+        """Serve root-level static files."""
+        from starlette.requests import Request
+        return FileResponse(str(FRONTEND_BUILD / "favicon.svg"))
+    
+    # SPA fallback — serve index.html for all non-API routes
+    @app.get("/{path:path}")
+    async def serve_react_app(path: str):
+        """Serve React app for client-side routing."""
+        # If the exact file exists in the build, serve it
+        file_path = FRONTEND_BUILD / path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(str(file_path))
+        # Otherwise, serve index.html (React Router handles routing)
+        return FileResponse(str(FRONTEND_BUILD / "index.html"))
+else:
+    logger.info("ℹ️ No frontend build found. Running API-only mode.")
+    logger.info("   To serve frontend, run: cd frontend && npm run build")
 
 
 if __name__ == "__main__":
