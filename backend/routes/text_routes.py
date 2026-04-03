@@ -34,6 +34,10 @@ class TextDetectionResponse(BaseModel):
     detection_type: Optional[str] = None
     detection_id: Optional[str] = None
     input_preview: Optional[str] = None
+    web_search_summary: Optional[str] = None
+    source_link: Optional[str] = None
+    source_title: Optional[str] = None
+    source_snippet: Optional[str] = None
     error: Optional[str] = None
 
 

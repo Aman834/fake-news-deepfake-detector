@@ -34,9 +34,20 @@ export default function ImageDetectionPage() {
 
     try {
       const response = await detectImage(file);
-      setResult(response);
+      console.log('Image detection response:', response);
+      if (response && response.prediction) {
+        setResult(response);
+      } else {
+        setError('Unexpected response from server. Please try again.');
+      }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Image analysis failed.');
+      console.error('Image detection error:', err);
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setError(detail.map(d => d.msg).join('; '));
+      } else {
+        setError(detail || err.message || 'Image analysis failed.');
+      }
     } finally {
       setLoading(false);
     }

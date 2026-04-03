@@ -26,9 +26,20 @@ export default function TextDetectionPage() {
 
     try {
       const response = await detectText(text, title);
-      setResult(response);
+      console.log('Detection response:', response);
+      if (response && response.prediction) {
+        setResult(response);
+      } else {
+        setError('Unexpected response from server. Please try again.');
+      }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Detection failed. Please try again.');
+      console.error('Detection error:', err);
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setError(detail.map(d => d.msg).join('; '));
+      } else {
+        setError(detail || err.message || 'Detection failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
