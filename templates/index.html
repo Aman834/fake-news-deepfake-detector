@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Real-time AI-powered system to detect fake news articles and deepfake images using machine learning.">
+  <title>TruthLens — Fake News & Deepfake Detector</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+</head>
+<body>
+
+  <!-- Animated Background Orbs -->
+  <div class="bg-particles">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+      <div class="logo-icon">🔍</div>
+      <h1>TruthLens</h1>
+      <p class="subtitle">Real-time AI-powered fake news &amp; deepfake detection system</p>
+    </header>
+
+    <!-- ===== TAB NAVIGATION ===== -->
+    <nav class="tab-nav" role="tablist">
+      <button class="tab-btn active" data-tab="text" role="tab" aria-selected="true" id="tab-text-btn">
+        <span class="tab-icon">📝</span>
+        <span>Text Analysis</span>
+      </button>
+      <button class="tab-btn" data-tab="image" role="tab" aria-selected="false" id="tab-image-btn">
+        <span class="tab-icon">🖼️</span>
+        <span>Image Analysis</span>
+      </button>
+      <button class="tab-btn" data-tab="dashboard" role="tab" aria-selected="false" id="tab-dashboard-btn">
+        <span class="tab-icon">📊</span>
+        <span>Dashboard</span>
+      </button>
+    </nav>
+
+    <!-- ===== TEXT ANALYSIS TAB ===== -->
+    <section class="tab-content active" id="tab-text" role="tabpanel">
+      <div class="card">
+        <h2 class="card-title">Analyze Article Text</h2>
+        <p class="card-subtitle">Paste a news article below to check if it's real or fake</p>
+
+        <textarea
+          class="text-input-area"
+          id="article-input"
+          placeholder="Paste the full news article text here..."
+          spellcheck="false"
+        ></textarea>
+
+        <div class="input-footer">
+          <div class="sample-section">
+            <button class="sample-btn" id="sample-real-btn">📰 Try Real Sample</button>
+            <button class="sample-btn" id="sample-fake-btn">🚫 Try Fake Sample</button>
+          </div>
+          <span class="char-count" id="char-count">0 chars</span>
+        </div>
+
+        <button class="btn-primary" id="analyze-text-btn">
+          <span class="spinner"></span>
+          <span class="btn-text">🔎 Analyze Article</span>
+        </button>
+      </div>
+
+      <!-- Text Result -->
+      <div class="result-container" id="text-result">
+        <div class="result-card" id="text-result-card">
+          <div class="result-header">
+            <span class="result-badge" id="text-result-badge"></span>
+            <span class="result-label" id="text-result-label"></span>
+          </div>
+          <div class="confidence-section">
+            <div class="confidence-label">
+              <span>Confidence Level</span>
+              <span class="confidence-value" id="text-confidence-value">0%</span>
+            </div>
+            <div class="confidence-bar-bg">
+              <div class="confidence-bar-fill" id="text-confidence-bar"></div>
+            </div>
+          </div>
+          <div class="details-grid" id="text-details-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== IMAGE ANALYSIS TAB ===== -->
+    <section class="tab-content" id="tab-image" role="tabpanel">
+      <div class="card">
+        <h2 class="card-title">Analyze Image for Deepfakes</h2>
+        <p class="card-subtitle">Upload an image to detect potential deepfake manipulation</p>
+
+        <div class="upload-zone" id="upload-zone">
+          <span class="upload-icon">📤</span>
+          <p class="upload-title">Drop image here or <span class="upload-browse">browse files</span></p>
+          <p class="upload-hint">Supports JPG, PNG — Max 10MB</p>
+          <input type="file" id="image-input" accept="image/jpeg,image/png,image/webp" hidden>
+        </div>
+
+        <div class="upload-preview" id="upload-preview">
+          <img id="preview-img" src="" alt="Uploaded image preview">
+          <button class="remove-btn" id="remove-image-btn" title="Remove image">✕</button>
+        </div>
+
+        <button class="btn-primary" id="analyze-image-btn" disabled>
+          <span class="spinner"></span>
+          <span class="btn-text">🔎 Analyze Image</span>
+        </button>
+      </div>
+
+      <!-- Image Result -->
+      <div class="result-container" id="image-result">
+        <div class="result-card" id="image-result-card">
+          <div class="result-header">
+            <span class="result-badge" id="image-result-badge"></span>
+            <span class="result-label" id="image-result-label"></span>
+          </div>
+          <div class="confidence-section">
+            <div class="confidence-label">
+              <span>Confidence Level</span>
+              <span class="confidence-value" id="image-confidence-value">0%</span>
+            </div>
+            <div class="confidence-bar-bg">
+              <div class="confidence-bar-fill" id="image-confidence-bar"></div>
+            </div>
+          </div>
+          <div class="details-grid" id="image-details-grid"></div>
+
+          <!-- ELA Comparison -->
+          <div class="ela-section" id="ela-section" style="display:none;">
+            <h3>🔬 Error Level Analysis (ELA)</h3>
+            <div class="ela-comparison">
+              <div class="ela-box">
+                <img id="ela-original" src="" alt="Original image">
+                <p>Original</p>
+              </div>
+              <div class="ela-box">
+                <img id="ela-result" src="" alt="ELA heatmap">
+                <p>ELA Heatmap</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DASHBOARD TAB ===== -->
+    <section class="tab-content" id="tab-dashboard" role="tabpanel">
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🔍</div>
+          <div class="stat-number" id="stat-total">0</div>
+          <div class="stat-label">Total Analyses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div class="stat-number" id="stat-text">0</div>
+          <div class="stat-label">Text Analyses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🖼️</div>
+          <div class="stat-number" id="stat-image">0</div>
+          <div class="stat-label">Image Analyses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-number" id="stat-fake">0</div>
+          <div class="stat-label">Fakes Detected</div>
+        </div>
+      </div>
+
+      <div class="card history-section">
+        <h3>📋 Analysis History</h3>
+        <div class="history-list" id="history-list">
+          <div class="empty-state" id="empty-history">
+            <div class="empty-icon">📭</div>
+            <p>No analyses yet. Start by analyzing some content!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <span id="toast-icon"></span>
+    <span id="toast-message"></span>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
